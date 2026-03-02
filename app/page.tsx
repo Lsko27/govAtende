@@ -1,7 +1,6 @@
 import LevelProgress from "@/components/level-progress";
 import Navbar from "../components/navbar";
 import SearchInput from "@/components/search-input";
-import { Card } from "@/components/ui/card";
 import {
   BookSearch,
   Building,

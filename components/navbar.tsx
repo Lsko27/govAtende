@@ -1,25 +1,30 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Bell, User } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
     <Card>
-      <div className="mx-5 flex items-center justify-between">
-        <Image
-          src="/GovAtende-blue.png"
-          width={130}
-          height={130}
-          alt="GovAtende"
-        />
-        <div className="flex items-center justify-between gap-4">
-          <Bell className="h-6 w-6 text-gray-500" />
+      <CardContent>
+        <div className=" flex items-center justify-between">
+          <Link href="/">
+            <Image
+              src="/GovAtende.png"
+              width={130}
+              height={130}
+              alt="GovAtende"
+            />
+          </Link>
+          <div className="flex items-center justify-between gap-4">
+            <Bell className="h-6 w-6 text-gray-500" />
 
-          <div className="h-10 w-10 flex items-center justify-center rounded-full bg-zinc-700">
-            <User className="h-6 w-6 text-gray-300" />
+            <div className="h-10 w-10 flex items-center justify-center rounded-full bg-zinc-700">
+              <User className="h-6 w-6 text-gray-300" />
+            </div>
           </div>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 };
