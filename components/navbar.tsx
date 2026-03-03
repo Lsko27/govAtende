@@ -8,7 +8,7 @@ const Navbar = () => {
     <Card>
       <CardContent>
         <div className=" flex items-center justify-between">
-          <Link href="/">
+          <Link href="/servicos">
             <Image
               src="/GovAtende.png"
               width={130}

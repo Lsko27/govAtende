@@ -1,73 +1,36 @@
-import LevelProgress from "@/components/level-progress";
-import Navbar from "../components/navbar";
-import SearchInput from "@/components/search-input";
-import {
-  BookSearch,
-  Building,
-  Car,
-  Lightbulb,
-  Trash2,
-  Trees,
-} from "lucide-react";
-import ServiceCard from "@/components/service-card";
+import Image from "next/image";
+import Link from "next/link";
 
-const services = [
-  {
-    icon: Building,
-    title: "Infraestrutura Urbana",
-    href: "/servicos/infraestrutura",
-  },
-  {
-    icon: Lightbulb,
-    title: "Iluminação",
-    href: "/servicos/iluminacao",
-  },
-  {
-    icon: Trees,
-    title: "Zeladoria e Meio Ambiente",
-    href: "/servicos/zeladoria",
-  },
-  {
-    icon: Trash2,
-    title: "Limpeza Urbana",
-    href: "/servicos/limpeza",
-  },
-  {
-    icon: BookSearch,
-    title: "Fiscalização",
-    href: "/servicos/fiscalizacao",
-  },
-  {
-    icon: Car,
-    title: "Mobilidade Urbana",
-    href: "/servicos/mobilidade",
-  },
-];
-
-const Home = () => {
+const SplashScreenPage = () => {
   return (
-    <>
-      <Navbar />
-      <LevelProgress />
-      <div className="mx-5 mt-5">
-        <SearchInput />
+    <div className="min-h-screen bg-white flex flex-col justify-between px-6 py-12">
+      <div className="flex flex-col items-center">
+        <Image
+          src="/govAtende-splash.png"
+          alt="Splash Screen"
+          width={700}
+          height={200}
+          className="mt-12"
+        />
       </div>
 
-      <div className="mt-4 mx-5">
-        <h1 className="text-2xl font-bold text-blue-900">Serviços</h1>
-        <div className="mt-3 flex flex-col gap-1">
-          {services.map((service) => (
-            <ServiceCard
-              key={service.href}
-              icon={service.icon}
-              title={service.title}
-              href={service.href}
-            />
-          ))}
-        </div>
+      <div className="flex flex-col gap-4 mb-6">
+        <Link
+          href="/login"
+          className="bg-blue-800 text-white text-center py-3 rounded-full font-medium"
+        >
+          Entrar com gov.br
+        </Link>
+
+        <Link
+          href="#"
+          className="border-2 border-blue-800 text-blue-800 text-center py-3 rounded-full font-medium"
+        >
+          Cadastrar
+        </Link>
       </div>
-    </>
+    </div>
   );
 };
 
-export default Home;
+export default SplashScreenPage;
