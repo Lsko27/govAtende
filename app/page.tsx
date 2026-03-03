@@ -23,7 +23,7 @@ const SplashScreenPage = () => {
         </Link>
 
         <Link
-          href="#"
+          href="/cadastro"
           className="border-2 border-blue-800 text-blue-800 text-center py-3 rounded-full font-medium"
         >
           Cadastrar

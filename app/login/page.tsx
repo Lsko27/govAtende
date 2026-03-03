@@ -12,6 +12,7 @@ import {
   Landmark,
   Smartphone,
 } from "lucide-react";
+import { formatCpf } from "@/utils/formatters";
 
 const LoginPage = () => {
   const [step, setStep] = useState<"cpf" | "senha">("cpf");
@@ -38,7 +39,7 @@ const LoginPage = () => {
 
                   <Input
                     value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
+                    onChange={(e) => setCpf(formatCpf(e.target.value))}
                     placeholder="Digite seu CPF"
                     className="placeholder:italic"
                   />
@@ -93,8 +94,8 @@ const LoginPage = () => {
               <>
                 <h1 className="font-bold text-lg">Digite sua senha</h1>
 
-                <div className="mt-6">
-                  <p className="text-sm text-gray-500">CPF</p>
+                <div className="mt-6 flex flex-col gap-1">
+                  <p className="text-md text-gray-800 font-medium">CPF</p>
                   <p className="font-bold">{cpf}</p>
                 </div>
 
