@@ -1,3 +1,4 @@
+import IdentificationOption from "@/components/identification-option";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,27 +42,28 @@ const LoginPage = () => {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 mb-12">
-            <div className="flex items-center gap-3 text-green-500">
-              <Landmark className="h-6 w-6" />
-              <p className="text-sm">Login com seu banco</p>
-              <div className="bg-green-500 px-2 py-1">
-                <p className="text-xs font-bold uppercase text-white">
-                  sua conta será prata
-                </p>
-              </div>
-            </div>
-            <div className="mt-3 flex items-center gap-3 ">
-              <Smartphone className="h-6 w-6 text-blue-600" />
-              <p className="text-sm">Seu aplicativo gov.br</p>
-            </div>
-            <div className="mt-3 flex items-center gap-3 ">
-              <BookMarked className="h-6 w-6 text-blue-600" />
-              <p className="text-sm">Seu certificado digital</p>
-            </div>
-            <div className="mt-3 flex items-center gap-3 ">
-              <CloudUpload className="h-6 w-6 text-blue-600" />
-              <p className="text-sm">Seu certificado digital em nuvem</p>
-            </div>
+            <IdentificationOption
+              icon={Landmark}
+              label="Login com seu banco"
+              iconColor="text-green-500"
+              badgeText="sua conta será prata"
+              badgeColor="bg-green-500"
+            />
+
+            <IdentificationOption
+              icon={Smartphone}
+              label="Seu aplicativo gov.br"
+            />
+
+            <IdentificationOption
+              icon={BookMarked}
+              label="Seu certificado digital"
+            />
+
+            <IdentificationOption
+              icon={CloudUpload}
+              label="Seu certificado digital em nuvem"
+            />
           </div>
         </div>
       </div>
