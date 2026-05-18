@@ -1,7 +1,10 @@
 import LevelProgress from "@/components/level-progress";
 import Navbar from "@/components/navbar";
 import SearchInput from "@/components/search-input";
+import SubServiceCard from "@/components/sub-service-card";
 import { services } from "@/data/services";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type PageProps = {
@@ -24,19 +27,38 @@ const ServicePage = async ({ params }: PageProps) => {
       <Navbar />
       <LevelProgress />
 
-      <div className="mx-5 mt-5">
+      <main className="min-h-screen bg-zinc-100 px-5 pt-5">
         <SearchInput />
-      </div>
 
-      <main className="mx-5 mt-6">
-        <h1 className="text-2xl font-bold text-blue-900">
-          {service.pageTitle}
-        </h1>
+        <div className="mt-5">
+          <div className="flex items-center gap-1">
+            <h1 className="text-2xl font-bold text-blue-950">Serviços</h1>
 
-        <p className="mt-3 text-gray-600">
-          Selecione ou acompanhe solicitações relacionadas a {service.pageTitle}
-          .
-        </p>
+            <span className="text-sm font-bold text-zinc-500">&gt;</span>
+
+            <span className="text-sm font-bold text-blue-700">
+              {service.pageTitle}
+            </span>
+          </div>
+
+          <div className="mt-3 flex flex-col gap-2">
+            {service.items.map((item) => (
+              <SubServiceCard
+                key={item.href}
+                title={item.title}
+                href={item.href}
+              />
+            ))}
+          </div>
+
+          <Link
+            href="/servicos"
+            className="mt-5 flex items-center gap-2 text-sm text-blue-950"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            voltar
+          </Link>
+        </div>
       </main>
     </>
   );
