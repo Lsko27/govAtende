@@ -13,10 +13,71 @@ import {
   Smartphone,
 } from "lucide-react";
 import { formatCpf } from "@/utils/formatters";
+import { isValidCpf } from "@/utils/validateCpf";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 const LoginPage = () => {
   const [step, setStep] = useState<"cpf" | "senha">("cpf");
   const [cpf, setCpf] = useState("");
+  const [cpfError, setCpfError] = useState("");
+  const [senha, setSenha] = useState("");
+  const [senhaError, setSenhaError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  const handleCpfContinue = () => {
+    if (!cpf) {
+      setCpfError("O CPF é obrigatório.");
+      return;
+    }
+
+    if (!isValidCpf(cpf)) {
+      setCpfError("CPF inválido. Por favor, verifique e tente novamente.");
+      return;
+    }
+    setCpfError("");
+    setStep("senha");
+  };
+
+  const sleep = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  const handleLogin = async () => {
+    if (!senha) {
+      setSenhaError("Informe sua senha.");
+      return;
+    }
+
+    if (senha.length < 6) {
+      setSenhaError("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
+    setSenhaError("");
+    setIsLoading(true);
+
+    await sleep(2000);
+
+    console.log("Login enviado:", {
+      cpf,
+      senha,
+    });
+
+    setIsLoading(false);
+
+    await Swal.fire({
+      icon: "success",
+      title: "Login realizado com sucesso!",
+      text: "Você será redirecionado para a área de serviços.",
+      confirmButtonText: "Continuar",
+      confirmButtonColor: "#1e40af",
+    });
+
+    router.push("/servicos");
+  };
 
   return (
     <>
@@ -39,18 +100,22 @@ const LoginPage = () => {
 
                   <Input
                     value={cpf}
-                    onChange={(e) => setCpf(formatCpf(e.target.value))}
+                    onChange={(e) => {
+                      setCpf(formatCpf(e.target.value));
+                      setCpfError("");
+                    }}
                     placeholder="Digite seu CPF"
+                    maxLength={14}
                     className="placeholder:italic"
                   />
+
+                  {cpfError && (
+                    <p className="text-sm text-red-600">{cpfError}</p>
+                  )}
                 </div>
 
                 <Button
-                  onClick={() => {
-                    if (cpf.length >= 11) {
-                      setStep("senha");
-                    }
-                  }}
+                  onClick={handleCpfContinue}
                   className="w-full mt-8 rounded-full bg-blue-800 text-md"
                 >
                   Continuar
@@ -104,13 +169,32 @@ const LoginPage = () => {
 
                   <Input
                     type="password"
+                    value={senha}
+                    onChange={(e) => {
+                      setSenha(e.target.value);
+                      setSenhaError("");
+                    }}
                     placeholder="Digite sua senha atual"
                     className="placeholder:italic"
                   />
+
+                  {senhaError && (
+                    <p className="text-sm text-red-600">{senhaError}</p>
+                  )}
                 </div>
 
-                <Button className="w-full mt-8 rounded-full bg-blue-800 text-md">
-                  Continuar
+                <Button
+                  onClick={handleLogin}
+                  disabled={isLoading}
+                  className="w-full mt-8 rounded-full bg-blue-800 text-md disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    {isLoading && (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    )}
+
+                    {isLoading ? "Entrando..." : "Continuar"}
+                  </span>
                 </Button>
               </>
             )}
