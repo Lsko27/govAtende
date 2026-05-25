@@ -3,6 +3,7 @@
 import { useState } from "react";
 import IdentificationOption from "@/components/identification-option";
 import Navbar from "@/components/navbar";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +16,7 @@ import {
 import { formatCpf } from "@/utils/formatters";
 import { isValidCpf } from "@/utils/validateCpf";
 import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
+import { validatePassword } from "@/utils/validatePassword";
 
 const LoginPage = () => {
   const [step, setStep] = useState<"cpf" | "senha">("cpf");
@@ -46,37 +47,37 @@ const LoginPage = () => {
   };
 
   const handleLogin = async () => {
-    if (!senha) {
-      setSenhaError("Informe sua senha.");
+    const passwordError = validatePassword(senha);
+
+    if (passwordError) {
+      await Swal.fire({
+        icon: "error",
+        title: "Senha inválida",
+        text: passwordError,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#1e40af",
+      });
+
       return;
     }
 
-    if (senha.length < 6) {
-      setSenhaError("A senha deve ter pelo menos 6 caracteres.");
-      return;
-    }
-
-    setSenhaError("");
     setIsLoading(true);
 
-    await sleep(2000);
+    try {
+      await sleep(3000);
 
-    console.log("Login enviado:", {
-      cpf,
-      senha,
-    });
+      await Swal.fire({
+        icon: "success",
+        title: "Login realizado com sucesso!",
+        text: "Você será redirecionado para a área de serviços.",
+        confirmButtonText: "Continuar",
+        confirmButtonColor: "#1e40af",
+      });
 
-    setIsLoading(false);
-
-    await Swal.fire({
-      icon: "success",
-      title: "Login realizado com sucesso!",
-      text: "Você será redirecionado para a área de serviços.",
-      confirmButtonText: "Continuar",
-      confirmButtonColor: "#1e40af",
-    });
-
-    router.push("/servicos");
+      router.push("/servicos");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
