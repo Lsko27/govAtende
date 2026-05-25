@@ -13,7 +13,7 @@ import {
   Landmark,
   Smartphone,
 } from "lucide-react";
-import { formatCpf } from "@/utils/formatters";
+import { formatCpf, maskCpf } from "@/utils/formatters";
 import { isValidCpf } from "@/utils/validateCpf";
 import { useRouter } from "next/navigation";
 import { validatePassword } from "@/utils/validatePassword";
@@ -42,14 +42,17 @@ const LoginPage = () => {
     setStep("senha");
   };
 
-  const sleep = (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
+  async function fakeLogin() {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    return true;
+  }
 
   const handleLogin = async () => {
     const passwordError = validatePassword(senha);
 
     if (passwordError) {
+      setSenhaError(passwordError);
+
       await Swal.fire({
         icon: "error",
         title: "Senha inválida",
@@ -61,10 +64,11 @@ const LoginPage = () => {
       return;
     }
 
+    setSenhaError("");
     setIsLoading(true);
 
     try {
-      await sleep(3000);
+      await fakeLogin();
 
       await Swal.fire({
         icon: "success",
@@ -75,6 +79,14 @@ const LoginPage = () => {
       });
 
       router.push("/servicos");
+    } catch {
+      await Swal.fire({
+        icon: "error",
+        title: "Erro ao realizar login",
+        text: "Não foi possível concluir o login. Tente novamente.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#1e40af",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +174,7 @@ const LoginPage = () => {
 
                 <div className="mt-6 flex flex-col gap-1">
                   <p className="text-md text-gray-800 font-medium">CPF</p>
-                  <p className="font-bold">{cpf}</p>
+                  <p className="font-bold">{maskCpf(cpf)}</p>
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3">
