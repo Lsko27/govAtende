@@ -36,7 +36,6 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
     handleSubmit,
     setValue,
     setFocus,
-    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<OccurrenceFormData>({
@@ -55,7 +54,7 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
     },
   });
 
-  const cepValue = watch("cep");
+  const cepRegister = register("cep");
 
   const router = useRouter();
 
@@ -197,10 +196,12 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
           type="text"
           placeholder="Digite o CEP"
           maxLength={9}
-          value={cepValue}
           className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
-          {...register("cep")}
-          onChange={handleCepChange}
+          {...cepRegister}
+          onChange={(event) => {
+            cepRegister.onChange(event);
+            handleCepChange(event);
+          }}
         />
 
         {errors.cep && (
