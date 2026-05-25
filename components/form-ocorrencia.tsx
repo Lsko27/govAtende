@@ -154,7 +154,13 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
     }
   };
 
+  const sleep = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
   const onSubmit = async (data: OccurrenceFormData) => {
+    await sleep(3000);
+
     const occurrence = {
       id: crypto.randomUUID(),
       titulo: data.title,
@@ -413,10 +419,15 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 rounded-md bg-blue-950 px-5 py-3 text-sm font-medium text-white disabled:opacity-70"
+          className="flex items-center gap-2 rounded-md bg-blue-950 px-5 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
         >
-          Continuar
-          <ArrowRight className="h-4 w-4" />
+          {isSubmitting && (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          )}
+
+          {isSubmitting ? "Registrando..." : "Continuar"}
+
+          {!isSubmitting && <ArrowRight className="h-4 w-4" />}
         </button>
       </div>
     </form>
