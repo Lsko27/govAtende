@@ -5,62 +5,16 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import * as yup from "yup";
 import Swal from "sweetalert2";
 
-type OccurrenceFormData = {
-  title: string;
-  description: string;
-  cep: string;
-  logradouro: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  date: string;
-  urgency: string;
-  image?: FileList;
-};
+import {
+  occurrenceSchema,
+  type OccurrenceFormData,
+} from "@/schemas/ocurrenceSchema";
 
 type OccurrenceFormProps = {
   backHref: string;
 };
-
-const occurrenceSchema: yup.ObjectSchema<OccurrenceFormData> = yup.object({
-  title: yup
-    .string()
-    .required("Informe o título da ocorrência.")
-    .min(5, "O título deve ter pelo menos 5 caracteres."),
-
-  description: yup
-    .string()
-    .required("Informe a descrição do problema.")
-    .min(10, "A descrição deve ter pelo menos 10 caracteres."),
-
-  cep: yup
-    .string()
-    .required("Informe o CEP.")
-    .matches(/^\d{5}-?\d{3}$/, "Informe um CEP válido."),
-
-  logradouro: yup.string().required("Informe o logradouro."),
-
-  numero: yup.string().required("Informe o número."),
-
-  bairro: yup.string().required("Informe o bairro."),
-
-  cidade: yup.string().required("Informe a cidade."),
-
-  estado: yup
-    .string()
-    .required("Informe o estado.")
-    .length(2, "Use a sigla do estado com 2 letras."),
-
-  date: yup.string().required("Informe a data da ocorrência."),
-
-  urgency: yup.string().required("Selecione o grau de urgência."),
-
-  image: yup.mixed<FileList>().optional(),
-});
 
 const cleanCep = (value: string) => {
   return value.replace(/\D/g, "");
@@ -336,6 +290,12 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
             maxLength={2}
             className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm uppercase outline-none placeholder:text-zinc-400 focus:border-blue-800"
             {...register("estado")}
+            onChange={(event) => {
+              setValue("estado", event.target.value.toUpperCase(), {
+                shouldValidate: true,
+                shouldDirty: true,
+              });
+            }}
           />
 
           {errors.estado && (
