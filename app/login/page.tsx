@@ -18,6 +18,7 @@ import { formatCpf, maskCpf } from "@/utils/formatters";
 import { isValidCpf } from "@/utils/validateCpf";
 import { useRouter } from "next/navigation";
 import { validatePassword } from "@/utils/validatePassword";
+import Link from "next/link";
 
 const LoginPage = () => {
   const [step, setStep] = useState<"cpf" | "senha">("cpf");
@@ -212,6 +213,15 @@ const LoginPage = () => {
                 {senhaError && (
                   <p className="text-xs text-red-600">{senhaError}</p>
                 )}
+              </div>
+
+              <div className="mt-4 flex items-center justify-start">
+                <Link
+                  href="/recuperar-senha"
+                  className="text-sm text-blue-800 hover:underline"
+                >
+                  Esqueceu sua senha?
+                </Link>
               </div>
 
               <Button

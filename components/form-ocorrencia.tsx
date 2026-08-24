@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, ImageIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, ImageIcon, Paperclip } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
@@ -147,56 +147,49 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
     router.push("/servicos");
   };
 
+  const labelClass =
+    "mb-1 block text-sm font-medium text-blue-950 lg:text-[17px]";
+
+  const inputClass =
+    "h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:italic placeholder:text-zinc-400 focus:border-blue-800 lg:h-[29px] lg:rounded-lg";
+
+  const errorClass = "mt-1 text-xs text-red-600";
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mt-4 flex flex-col gap-3"
+      className="
+      mt-4 flex flex-col gap-3
+      lg:mx-auto lg:mt-10 lg:grid lg:w-[80%] lg:max-w-275
+      lg:grid-cols-2 lg:gap-x-3 lg:gap-y-3
+    "
     >
+      {/* Título */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Título da Ocorrência
-        </label>
+        <label className={labelClass}>Título</label>
 
         <input
           type="text"
           placeholder="Relate a ocorrência"
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
+          className={inputClass}
           {...register("title")}
         />
 
-        {errors.title && (
-          <p className="mt-1 text-xs text-red-600">{errors.title.message}</p>
-        )}
+        {errors.title && <p className={errorClass}>{errors.title.message}</p>}
       </div>
 
+      {/* Localização / CEP */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Descrição do Problema
-        </label>
-
-        <textarea
-          placeholder="Descreva aqui o problema"
-          className="min-h-20 w-full resize-none rounded-md border border-zinc-400 bg-white px-3 py-2 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
-          {...register("description")}
-        />
-
-        {errors.description && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.description.message}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          CEP
+        <label className={labelClass}>
+          <span className="lg:hidden">CEP</span>
+          <span className="hidden lg:inline">Localização</span>
         </label>
 
         <input
           type="text"
-          placeholder="Digite o CEP"
+          placeholder="Digite endereço ou CEP"
           maxLength={9}
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
+          className={inputClass}
           {...cepRegister}
           onChange={(event) => {
             cepRegister.onChange(event);
@@ -204,131 +197,140 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
           }}
         />
 
-        {errors.cep && (
-          <p className="mt-1 text-xs text-red-600">{errors.cep.message}</p>
+        {errors.cep && <p className={errorClass}>{errors.cep.message}</p>}
+      </div>
+
+      {/* Descrição */}
+      <div className="lg:col-span-2">
+        <label className={labelClass}>Descrição da Ocorrência</label>
+
+        <textarea
+          placeholder="Descreva aqui o problema"
+          className="
+          min-h-20 w-full resize-none rounded-md border border-zinc-400
+          bg-white px-3 py-2 text-sm outline-none
+          placeholder:italic placeholder:text-zinc-400
+          focus:border-blue-800
+          lg:min-h-33.5 lg:rounded-lg
+        "
+          {...register("description")}
+        />
+
+        {errors.description && (
+          <p className={errorClass}>{errors.description.message}</p>
         )}
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Logradouro
-        </label>
+      {/* Logradouro */}
+      <div className="lg:col-span-2">
+        <label className={labelClass}>Logradouro</label>
 
         <input
           type="text"
           placeholder="Rua, avenida, travessa..."
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
+          className={inputClass}
           {...register("logradouro")}
         />
 
         {errors.logradouro && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.logradouro.message}
-          </p>
+          <p className={errorClass}>{errors.logradouro.message}</p>
         )}
       </div>
 
+      {/* Número */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Número
-        </label>
+        <label className={labelClass}>Número</label>
 
         <input
           type="text"
           placeholder="Digite o número"
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
+          className={inputClass}
           {...register("numero")}
         />
 
-        {errors.numero && (
-          <p className="mt-1 text-xs text-red-600">{errors.numero.message}</p>
-        )}
+        {errors.numero && <p className={errorClass}>{errors.numero.message}</p>}
       </div>
 
+      {/* Bairro */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Bairro
-        </label>
+        <label className={labelClass}>Bairro</label>
 
         <input
           type="text"
           placeholder="Bairro"
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
+          className={inputClass}
           {...register("bairro")}
         />
 
-        {errors.bairro && (
-          <p className="mt-1 text-xs text-red-600">{errors.bairro.message}</p>
-        )}
+        {errors.bairro && <p className={errorClass}>{errors.bairro.message}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-blue-950">
-            Cidade
-          </label>
-
-          <input
-            type="text"
-            placeholder="Cidade"
-            className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
-            {...register("cidade")}
-          />
-
-          {errors.cidade && (
-            <p className="mt-1 text-xs text-red-600">{errors.cidade.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-blue-950">
-            Estado
-          </label>
-
-          <input
-            type="text"
-            placeholder="UF"
-            maxLength={2}
-            className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm uppercase outline-none placeholder:text-zinc-400 focus:border-blue-800"
-            {...register("estado")}
-            onChange={(event) => {
-              setValue("estado", event.target.value.toUpperCase(), {
-                shouldValidate: true,
-                shouldDirty: true,
-              });
-            }}
-          />
-
-          {errors.estado && (
-            <p className="mt-1 text-xs text-red-600">{errors.estado.message}</p>
-          )}
-        </div>
-      </div>
-
+      {/* Cidade */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Data da Ocorrência
-        </label>
+        <label className={labelClass}>Cidade</label>
 
         <input
-          type="date"
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-800"
-          {...register("date")}
+          type="text"
+          placeholder="Cidade"
+          className={inputClass}
+          {...register("cidade")}
         />
 
-        {errors.date && (
-          <p className="mt-1 text-xs text-red-600">{errors.date.message}</p>
-        )}
+        {errors.cidade && <p className={errorClass}>{errors.cidade.message}</p>}
       </div>
 
+      {/* Estado */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Imagem
-        </label>
+        <label className={labelClass}>Estado</label>
 
-        <label className="flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-zinc-400 bg-zinc-100 text-zinc-500">
-          <ImageIcon className="h-6 w-6" />
-          <span className="mt-1 text-sm">Anexar Imagem</span>
+        <input
+          type="text"
+          placeholder="UF"
+          maxLength={2}
+          className={`${inputClass} uppercase`}
+          {...register("estado")}
+          onChange={(event) => {
+            setValue("estado", event.target.value.toUpperCase(), {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+          }}
+        />
+
+        {errors.estado && <p className={errorClass}>{errors.estado.message}</p>}
+      </div>
+
+      {/* Data */}
+      <div>
+        <label className={labelClass}>Data da Ocorrência</label>
+
+        <input type="date" className={inputClass} {...register("date")} />
+
+        {errors.date && <p className={errorClass}>{errors.date.message}</p>}
+      </div>
+
+      {/* Imagem */}
+      <div>
+        <label className={labelClass}>Imagem</label>
+
+        <label
+          className="
+          flex h-24 w-full cursor-pointer flex-col items-center
+          justify-center rounded-md border border-zinc-400 bg-zinc-100
+          text-zinc-500
+          lg:h-7.5 lg:flex-row lg:justify-between lg:rounded-lg
+          lg:bg-white lg:px-3
+        "
+        >
+          <ImageIcon className="h-6 w-6 lg:hidden" />
+
+          <span className="mt-1 text-sm lg:hidden">Anexar Imagem</span>
+
+          <span className="hidden text-sm italic text-zinc-400 lg:inline">
+            Escolher arquivo
+          </span>
+
+          <Paperclip className="hidden h-4 w-4 text-blue-600 lg:block" />
 
           <input
             type="file"
@@ -339,19 +341,19 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
         </label>
       </div>
 
+      {/* Urgência */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-blue-950">
-          Grau de Urgência
-        </label>
+        <label className={labelClass}>Grau de Urgência</label>
 
         <select
           defaultValue=""
-          className="h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm text-zinc-500 outline-none focus:border-blue-800"
+          className={`${inputClass} text-zinc-500`}
           {...register("urgency")}
         >
           <option value="" disabled>
-            Qual o grau de urgência?
+            Selecione o grau de urgência
           </option>
+
           <option value="baixo">Baixo</option>
           <option value="medio">Médio</option>
           <option value="alto">Alto</option>
@@ -359,31 +361,56 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
         </select>
 
         {errors.urgency && (
-          <p className="mt-1 text-xs text-red-600">{errors.urgency.message}</p>
+          <p className={errorClass}>{errors.urgency.message}</p>
         )}
       </div>
 
-      <p className="mt-20 text-xs leading-relaxed text-blue-500">
-        A urgência ajuda a equipe a priorizar a análise da solicitação, mas o
-        prazo de atendimento pode variar conforme avaliação técnica.
+      {/* Observação */}
+      <p
+        className="
+        mt-20 text-xs leading-relaxed text-blue-500
+        lg:mt-0 lg:px-3 lg:text-[13px] lg:leading-5
+      "
+      >
+        A urgência ajuda a equipe a priorizar a análise, mas o prazo de
+        atendimento pode variar conforme avaliação técnica.
       </p>
 
-      <div className="mt-4 flex items-center justify-between">
+      {/* Navegação */}
+      <div
+        className="
+        mt-4 flex items-center justify-between
+        lg:col-span-2 lg:mt-3
+      "
+      >
         <Link
           href={backHref}
-          className="flex items-center gap-2 text-sm text-blue-950"
+          className="
+          flex items-center gap-2 text-sm text-blue-950
+          lg:text-base lg:font-semibold lg:text-blue-600
+        "
         >
           <ArrowLeft className="h-4 w-4" />
-          voltar
+          Voltar
         </Link>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 rounded-md bg-blue-950 px-5 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
+          className="
+          flex items-center gap-2 rounded-md bg-blue-950 px-5 py-3
+          text-sm font-medium text-white
+          disabled:cursor-not-allowed disabled:opacity-70
+          lg:rounded-lg lg:px-5 lg:text-base
+        "
         >
           {isSubmitting && (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <span
+              className="
+              h-4 w-4 animate-spin rounded-full border-2
+              border-white border-t-transparent
+            "
+            />
           )}
 
           {isSubmitting ? "Registrando..." : "Continuar"}
