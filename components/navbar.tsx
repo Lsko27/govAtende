@@ -19,7 +19,7 @@ type NavbarProps = {
 
 const Navbar = ({
   authenticated = false,
-  requestsHref = "/minhas-solicitacoes",
+  requestsHref = "/servicos/minhas-solicitacoes",
 }: NavbarProps) => {
   const homeHref = authenticated ? "/servicos" : "/";
 

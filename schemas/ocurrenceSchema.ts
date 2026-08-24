@@ -9,12 +9,11 @@ export type OccurrenceFormData = {
   bairro: string;
   cidade: string;
   estado: string;
-  date: string;
   urgency: string;
   image?: FileList;
 };
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
@@ -26,10 +25,7 @@ export const occurrenceSchema: yup.ObjectSchema<OccurrenceFormData> =
       .required("Informe o título da ocorrência.")
       .min(5, "O título deve ter pelo menos 5 caracteres.")
       .max(80, "O título deve ter no máximo 80 caracteres.")
-      .matches(
-        /[a-zA-ZÀ-ÿ]/,
-        "O título precisa conter letras, não apenas números ou símbolos.",
-      ),
+      .matches(/[a-zA-ZÀ-ÿ]/, "O título precisa conter letras."),
 
     description: yup
       .string()
@@ -77,25 +73,6 @@ export const occurrenceSchema: yup.ObjectSchema<OccurrenceFormData> =
       .length(2, "Use a sigla do estado com 2 letras.")
       .matches(/^[A-Z]{2}$/, "Informe uma UF válida."),
 
-    date: yup
-      .string()
-      .required("Informe a data da ocorrência.")
-      .test(
-        "not-future-date",
-        "A data da ocorrência não pode ser futura.",
-        (value) => {
-          if (!value) return false;
-
-          const selectedDate = new Date(value);
-          const today = new Date();
-
-          selectedDate.setHours(0, 0, 0, 0);
-          today.setHours(0, 0, 0, 0);
-
-          return selectedDate <= today;
-        },
-      ),
-
     urgency: yup
       .string()
       .required("Selecione o grau de urgência.")
@@ -107,8 +84,10 @@ export const occurrenceSchema: yup.ObjectSchema<OccurrenceFormData> =
     image: yup
       .mixed<FileList>()
       .optional()
-      .test("file-size", "A imagem deve ter no máximo 5MB.", (files) => {
-        if (!files || files.length === 0) return true;
+      .test("file-size", "A imagem deve ter no máximo 5 MB.", (files) => {
+        if (!files || files.length === 0) {
+          return true;
+        }
 
         return files[0].size <= MAX_FILE_SIZE;
       })
@@ -116,7 +95,9 @@ export const occurrenceSchema: yup.ObjectSchema<OccurrenceFormData> =
         "file-type",
         "A imagem deve estar em formato JPG, PNG ou WEBP.",
         (files) => {
-          if (!files || files.length === 0) return true;
+          if (!files || files.length === 0) {
+            return true;
+          }
 
           return allowedImageTypes.includes(files[0].type);
         },

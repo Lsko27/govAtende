@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, ImageIcon, Paperclip } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, type FieldErrors, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -290,9 +290,21 @@ const OccurrenceForm = ({ backHref, subservicoId }: OccurrenceFormProps) => {
 
   const errorClass = "mt-1 text-xs text-red-600";
 
+  const onInvalid = (formErrors: FieldErrors<OccurrenceFormData>) => {
+    console.error("Erros de validação:", formErrors);
+
+    void Swal.fire({
+      icon: "error",
+      title: "Revise os campos",
+      text: "Existem campos inválidos ou não preenchidos no formulário.",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#172554",
+    });
+  };
+
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
       className="
         mt-4 flex flex-col gap-3
         lg:mx-auto lg:mt-10 lg:grid lg:w-[80%] lg:max-w-275

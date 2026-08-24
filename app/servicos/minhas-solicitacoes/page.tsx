@@ -385,7 +385,6 @@ const MinhasSolicitacoesPage = () => {
 
   return (
     <>
-      <Navbar authenticated />
       <main className="min-h-[calc(100vh-72px)] bg-zinc-100">
         <section className="bg-linear-to-r from-blue-950 to-blue-800 text-white">
           <div className="mx-auto grid w-full max-w-7xl gap-6 px-5 py-7 md:px-8 lg:grid-cols-[1fr_auto] lg:items-center">
