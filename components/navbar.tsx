@@ -12,8 +12,8 @@ import {
   ClipboardList,
   LayoutDashboard,
   LogOut,
-  User,
   Settings,
+  User,
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,29 +37,28 @@ type NavbarProps = {
   userRole?: string;
 };
 
-const navigationConfig = {
+type NavigationConfig = {
+  homeHref: string;
+  loginHref: string;
+  logoutEndpoint: string;
+  settingsHref: string;
+};
+
+const navigationConfig: Record<NavbarVariant, NavigationConfig> = {
   cidadao: {
     homeHref: "/servicos",
     loginHref: "/",
     logoutEndpoint: "/api/auth/logout",
-    settingsHref: "/configuracoes",
+    settingsHref: "/configuracoes?perfil=cidadao",
   },
 
   servidor: {
     homeHref: "/servidor/painel",
     loginHref: "/servidor",
     logoutEndpoint: "/api/auth/servidor/logout",
-    settingsHref: "/servidor/configuracoes",
+    settingsHref: "/configuracoes?perfil=servidor",
   },
-} satisfies Record<
-  NavbarVariant,
-  {
-    homeHref: string;
-    loginHref: string;
-    logoutEndpoint: string;
-    settingsHref?: string;
-  }
->;
+};
 
 const Navbar = ({
   authenticated = false,
@@ -76,7 +75,13 @@ const Navbar = ({
 
   const currentNavigation = navigationConfig[variant];
 
-  const homeHref = authenticated ? currentNavigation.homeHref : "/";
+  const homeHref = authenticated
+    ? currentNavigation.homeHref
+    : currentNavigation.loginHref;
+
+  const displayedName = userName ?? (isServer ? "Servidor" : "Minha conta");
+
+  const displayedRole = userRole ?? (isServer ? "Servidor público" : "Cidadão");
 
   const handleLogout = async () => {
     if (isLoggingOut) {
@@ -156,14 +161,12 @@ const Navbar = ({
                 <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel className="font-normal">
                     <p className="truncate text-sm font-semibold text-blue-950">
-                      {userName ?? (isServer ? "Servidor" : "Minha conta")}
+                      {displayedName}
                     </p>
 
-                    {userRole && (
-                      <p className="mt-0.5 truncate text-xs text-zinc-500">
-                        {userRole}
-                      </p>
-                    )}
+                    <p className="mt-0.5 truncate text-xs text-zinc-500">
+                      {displayedRole}
+                    </p>
                   </DropdownMenuLabel>
 
                   <DropdownMenuSeparator />
@@ -198,11 +201,11 @@ const Navbar = ({
 
                   <DropdownMenuItem
                     disabled={isLoggingOut}
-                    onClick={() => void handleLogout()}
+                    onSelect={() => void handleLogout()}
                     className="
-    cursor-pointer text-red-600
-    focus:bg-red-50 focus:text-red-700
-  "
+                      cursor-pointer text-red-600
+                      focus:bg-red-50 focus:text-red-700
+                    "
                   >
                     <LogOut className="h-4 w-4 text-red-600" />
 
