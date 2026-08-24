@@ -9,12 +9,14 @@ import {
 } from "lucide-react";
 
 export type SubService = {
+  id: number;
   slug: string;
   title: string;
   href: string;
 };
 
 export type Service = {
+  id: number;
   slug: string;
   icon: LucideIcon;
   cardTitle: string;
@@ -23,258 +25,251 @@ export type Service = {
   items: SubService[];
 };
 
-const createOccurrenceHref = (serviceSlug: string, subServiceSlug: string) => {
-  return `/registro-ocorrencia?servico=${serviceSlug}&subservico=${subServiceSlug}`;
+const createOccurrenceHref = (
+  serviceSlug: string,
+  subServiceSlug: string,
+  subServiceId: number,
+) => {
+  return (
+    "/servicos/registro-ocorrencia" +
+    `?servico=${serviceSlug}` +
+    `&subservico=${subServiceSlug}` +
+    `&subservicoId=${subServiceId}`
+  );
 };
+
+const createSubService = (
+  id: number,
+  serviceSlug: string,
+  slug: string,
+  title: string,
+): SubService => ({
+  id,
+  slug,
+  title,
+  href: createOccurrenceHref(serviceSlug, slug, id),
+});
 
 export const services: Service[] = [
   {
+    id: 1,
     slug: "infraestrutura",
     icon: Building2,
     cardTitle: "Infraestrutura Urbana",
     pageTitle: "Infraestrutura Urbana",
     href: "/servicos/infraestrutura",
     items: [
-      {
-        slug: "buracos-na-via",
-        title: "Buracos na via",
-        href: createOccurrenceHref("infraestrutura", "buracos-na-via"),
-      },
-      {
-        slug: "recapeamento-asfaltico",
-        title: "Recapeamento asfáltico",
-        href: createOccurrenceHref("infraestrutura", "recapeamento-asfaltico"),
-      },
-      {
-        slug: "manutencao-de-calcadas",
-        title: "Manutenção de calçadas",
-        href: createOccurrenceHref("infraestrutura", "manutencao-de-calcadas"),
-      },
-      {
-        slug: "sinalizacao-viaria",
-        title: "Sinalização viária",
-        href: createOccurrenceHref("infraestrutura", "sinalizacao-viaria"),
-      },
-      {
-        slug: "manutencao-de-semaforos",
-        title: "Manutenção de semáforos",
-        href: createOccurrenceHref("infraestrutura", "manutencao-de-semaforos"),
-      },
-      {
-        slug: "lombadas-redutores-velocidade",
-        title: "Lombadas e redutores de velocidade",
-        href: createOccurrenceHref(
-          "infraestrutura",
-          "lombadas-redutores-velocidade",
-        ),
-      },
+      createSubService(2, "infraestrutura", "buracos-na-via", "Buracos na via"),
+      createSubService(
+        3,
+        "infraestrutura",
+        "recapeamento-asfaltico",
+        "Recapeamento asfáltico",
+      ),
+      createSubService(
+        4,
+        "infraestrutura",
+        "manutencao-de-calcadas",
+        "Manutenção de calçadas",
+      ),
+      createSubService(
+        5,
+        "infraestrutura",
+        "sinalizacao-viaria",
+        "Sinalização viária",
+      ),
+      createSubService(
+        6,
+        "infraestrutura",
+        "manutencao-de-semaforos",
+        "Manutenção de semáforos",
+      ),
+      createSubService(
+        7,
+        "infraestrutura",
+        "lombadas-redutores-velocidade",
+        "Lombadas e redutores de velocidade",
+      ),
     ],
   },
   {
+    id: 2,
     slug: "iluminacao",
     icon: Lightbulb,
-    cardTitle: "Iluminação",
-    pageTitle: "Iluminação",
+    cardTitle: "Iluminação Pública",
+    pageTitle: "Iluminação Pública",
     href: "/servicos/iluminacao",
     items: [
-      {
-        slug: "lampada-queimada",
-        title: "Lâmpada queimada",
-        href: createOccurrenceHref("iluminacao", "lampada-queimada"),
-      },
-      {
-        slug: "falta-de-iluminação-em-via-pública",
-        title: "Falta de iluminação em via pública",
-        href: createOccurrenceHref("iluminacao", "falta-de-iluminação-em-via-publica"),
-      },
-      {
-        slug: "manutencao-de-postes",
-        title: "Manutenção de postes",
-        href: createOccurrenceHref("iluminacao", "manutencao-de-postes"),
-      },
-      {
-        slug: "fiacao-exposta",
-        title: "Fiação exposta",
-        href: createOccurrenceHref("iluminacao", "fiacao-exposta"),
-      },
-      {
-        slug: "iluminação em praças",
-        title: "Iluminação em praças",
-        href: createOccurrenceHref("iluminacao", "iluminação-em-pracas"),
-      },
-      {
-        slug: "iluminacao-em-areas-de-risco",
-        title: "Iluminação em áreas de risco",
-        href: createOccurrenceHref("iluminacao", "iluminacao-em-areas-de-risco"),
-      },
+      createSubService(8, "iluminacao", "lampada-queimada", "Lâmpada queimada"),
+      createSubService(
+        9,
+        "iluminacao",
+        "falta-de-iluminacao-em-via-publica",
+        "Falta de iluminação em via pública",
+      ),
+      createSubService(
+        10,
+        "iluminacao",
+        "manutencao-de-postes",
+        "Manutenção de postes",
+      ),
+      createSubService(
+        11,
+        "iluminacao",
+        "iluminacao-em-pracas",
+        "Iluminação em praças",
+      ),
+      createSubService(
+        12,
+        "iluminacao",
+        "iluminacao-em-areas-de-risco",
+        "Iluminação em áreas de risco",
+      ),
     ],
   },
   {
+    id: 3,
     slug: "zeladoria",
     icon: Trees,
     cardTitle: "Zeladoria e Meio Ambiente",
     pageTitle: "Zeladoria e Meio Ambiente",
     href: "/servicos/zeladoria",
     items: [
-      {
-        slug: "poda-de-arvore",
-        title: "Poda de árvore",
-        href: createOccurrenceHref("zeladoria", "poda-de-arvore"),
-      },
-      {
-        slug: "Remocao-de-arvore-com-risco-de-queda",
-        title: "Remoção de árvore com risco de queda",
-        href: createOccurrenceHref("zeladoria", "remocao-de-arvore-com-risco-de-queda"),
-      },
-      {
-        slug: "limpeza-de-praças-e-areas-verdes",
-        title: "Limpeza de praças e áreas verdes",
-        href: createOccurrenceHref("zeladoria", "limpeza-de-praças-e-areas-verdes"),
-      },
-      {
-        slug: "capina-de-terrenos-publicos",
-        title: "Capina de terrenos públicos",
-        href: createOccurrenceHref("zeladoria", "capina-de-terrenos-publicos"),
-      },
-      {
-        slug: "manutencao-de-parques",
-        title: "Manutenção de Parques",
-        href: createOccurrenceHref("zeladoria", "manutencao-de-parques"),
-      },
-      {
-        slug: "descarte-irregular-em-area-verde",
-        title: "Descarte irregular em área verde",
-        href: createOccurrenceHref(
-          "zeladoria",
-          "descarte-irregular-em-area-verde",
-        ),
-      },
+      createSubService(13, "zeladoria", "poda-de-arvores", "Poda de árvores"),
+      createSubService(
+        14,
+        "zeladoria",
+        "remocao-de-arvores-em-risco-de-queda",
+        "Remoção de árvores em risco de queda",
+      ),
+      createSubService(
+        15,
+        "zeladoria",
+        "limpeza-de-pracas-e-areas-verdes",
+        "Limpeza de praças e áreas verdes",
+      ),
+      createSubService(
+        16,
+        "zeladoria",
+        "capina-de-terrenos-publicos",
+        "Capina de terrenos públicos",
+      ),
+      createSubService(
+        17,
+        "zeladoria",
+        "manutencao-de-parques",
+        "Manutenção de parques",
+      ),
     ],
   },
   {
+    id: 4,
     slug: "limpeza",
     icon: Trash2,
     cardTitle: "Limpeza Urbana",
     pageTitle: "Limpeza Urbana",
     href: "/servicos/limpeza",
     items: [
-      {
-        slug: "coleta-de-lixo",
-        title: "Coleta de lixo",
-        href: createOccurrenceHref("limpeza", "coleta-de-lixo"),
-      },
-      {
-        slug: "entulho-em-via-publica",
-        title: "Entulho em via pública",
-        href: createOccurrenceHref("limpeza", "entulho-em-via-publica"),
-      },
-      {
-        slug: "lixeira-danificada",
-        title: "Lixeira danificada",
-        href: createOccurrenceHref("limpeza", "lixeira-danificada"),
-      },
-      {
-        slug: "varricao-de-rua",
-        title: "Varrição de rua",
-        href: createOccurrenceHref("limpeza", "varricao-de-rua"),
-      },
-      {
-        slug: "bueiro-entupido",
-        title: "Bueiro entupido",
-        href: createOccurrenceHref("limpeza", "bueiro-entupido"),
-      },
-      {
-        slug: "lixo-acumulado",
-        title: "Lixo acumulado",
-        href: createOccurrenceHref("limpeza", "lixo-acumulado"),
-      },
+      createSubService(18, "limpeza", "coleta-de-entulho", "Coleta de entulho"),
+      createSubService(
+        19,
+        "limpeza",
+        "descarte-irregular-de-lixo",
+        "Descarte irregular de lixo",
+      ),
+      createSubService(
+        20,
+        "limpeza",
+        "limpeza-de-vias-publicas",
+        "Limpeza de vias públicas",
+      ),
+      createSubService(
+        21,
+        "limpeza",
+        "limpeza-pos-evento",
+        "Limpeza pós-evento",
+      ),
+      createSubService(22, "limpeza", "coleta-seletiva", "Coleta seletiva"),
     ],
   },
   {
+    id: 5,
     slug: "fiscalizacao",
     icon: BookSearch,
     cardTitle: "Fiscalização",
     pageTitle: "Fiscalização",
     href: "/servicos/fiscalizacao",
     items: [
-      {
-        slug: "comercio-irregular",
-        title: "Comércio irregular",
-        href: createOccurrenceHref("fiscalizacao", "comercio-irregular"),
-      },
-      {
-        slug: "obra-irregular",
-        title: "Obra irregular",
-        href: createOccurrenceHref("fiscalizacao", "obra-irregular"),
-      },
-      {
-        slug: "ocupacao-irregular-de-calcada",
-        title: "Ocupação irregular de calçada",
-        href: createOccurrenceHref(
-          "fiscalizacao",
-          "ocupacao-irregular-de-calcada",
-        ),
-      },
-      {
-        slug: "poluicao-sonora",
-        title: "Poluição sonora",
-        href: createOccurrenceHref("fiscalizacao", "poluicao-sonora"),
-      },
-      {
-        slug: "publicidade-irregular",
-        title: "Publicidade irregular",
-        href: createOccurrenceHref("fiscalizacao", "publicidade-irregular"),
-      },
-      {
-        slug: "descarte-irregular-de-residuos",
-        title: "Descarte irregular de resíduos",
-        href: createOccurrenceHref(
-          "fiscalizacao",
-          "descarte-irregular-de-residuos",
-        ),
-      },
+      createSubService(
+        23,
+        "fiscalizacao",
+        "denuncia-de-terreno-abandonado",
+        "Denúncia de terreno abandonado",
+      ),
+      createSubService(
+        24,
+        "fiscalizacao",
+        "fiscalizacao-de-obras-irregulares",
+        "Fiscalização de obras irregulares",
+      ),
+      createSubService(
+        25,
+        "fiscalizacao",
+        "fiscalizacao-de-comercio-irregular",
+        "Fiscalização de comércio irregular",
+      ),
+      createSubService(
+        26,
+        "fiscalizacao",
+        "poluicao-sonora",
+        "Poluição sonora",
+      ),
+      createSubService(
+        27,
+        "fiscalizacao",
+        "ocupacao-irregular-de-calcadas",
+        "Ocupação irregular de calçadas",
+      ),
     ],
   },
   {
+    id: 6,
     slug: "mobilidade",
     icon: Car,
     cardTitle: "Mobilidade Urbana",
     pageTitle: "Mobilidade Urbana",
     href: "/servicos/mobilidade",
     items: [
-      {
-        slug: "problema-em-ponto-de-onibus",
-        title: "Problema em ponto de ônibus",
-        href: createOccurrenceHref("mobilidade", "problema-em-ponto-de-onibus"),
-      },
-      {
-        slug: "faixa-de-pedestre",
-        title: "Faixa de pedestre",
-        href: createOccurrenceHref("mobilidade", "faixa-de-pedestre"),
-      },
-      {
-        slug: "semaforo-com-defeito",
-        title: "Semáforo com defeito",
-        href: createOccurrenceHref("mobilidade", "semaforo-com-defeito"),
-      },
-      {
-        slug: "placa-de-transito-danificada",
-        title: "Placa de trânsito danificada",
-        href: createOccurrenceHref(
-          "mobilidade",
-          "placa-de-transito-danificada",
-        ),
-      },
-      {
-        slug: "ciclovia-danificada",
-        title: "Ciclovia danificada",
-        href: createOccurrenceHref("mobilidade", "ciclovia-danificada"),
-      },
-      {
-        slug: "obstaculo-na-via",
-        title: "Obstáculo na via",
-        href: createOccurrenceHref("mobilidade", "obstaculo-na-via"),
-      },
+      createSubService(
+        28,
+        "mobilidade",
+        "solicitacao-de-ponto-de-onibus",
+        "Solicitação de ponto de ônibus",
+      ),
+      createSubService(
+        29,
+        "mobilidade",
+        "reclamacao-de-linha-de-onibus",
+        "Reclamação de linha de ônibus",
+      ),
+      createSubService(
+        30,
+        "mobilidade",
+        "falta-de-abrigo-em-ponto-de-onibus",
+        "Falta de abrigo em ponto de ônibus",
+      ),
+      createSubService(
+        31,
+        "mobilidade",
+        "problemas-de-acessibilidade",
+        "Problemas de acessibilidade",
+      ),
+      createSubService(
+        32,
+        "mobilidade",
+        "manutencao-de-ciclovias",
+        "Manutenção de ciclovias",
+      ),
     ],
   },
 ];

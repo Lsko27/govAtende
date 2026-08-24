@@ -1,11 +1,23 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, ImageIcon, Paperclip } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Swal from "sweetalert2";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   occurrenceSchema,
@@ -14,6 +26,20 @@ import {
 
 type OccurrenceFormProps = {
   backHref: string;
+  subservicoId: number;
+};
+
+type CreatedRequestResponse = {
+  id: number;
+};
+
+type ViaCepResponse = {
+  cep?: string;
+  logradouro?: string;
+  bairro?: string;
+  localidade?: string;
+  uf?: string;
+  erro?: boolean;
 };
 
 const cleanCep = (value: string) => {
@@ -21,7 +47,7 @@ const cleanCep = (value: string) => {
 };
 
 const formatCep = (value: string) => {
-  const onlyNumbers = cleanCep(value);
+  const onlyNumbers = cleanCep(value).slice(0, 8);
 
   if (onlyNumbers.length <= 5) {
     return onlyNumbers;
@@ -30,10 +56,11 @@ const formatCep = (value: string) => {
   return `${onlyNumbers.slice(0, 5)}-${onlyNumbers.slice(5, 8)}`;
 };
 
-const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
+const OccurrenceForm = ({ backHref, subservicoId }: OccurrenceFormProps) => {
   const {
     register,
     handleSubmit,
+    control,
     setValue,
     setFocus,
     reset,
@@ -49,14 +76,12 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
       bairro: "",
       cidade: "",
       estado: "",
-      date: "",
       urgency: "",
     },
   });
 
-  const cepRegister = register("cep");
-
   const router = useRouter();
+  const cepRegister = register("cep");
 
   const handleCepChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -78,80 +103,190 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
         `https://viacep.com.br/ws/${onlyNumbersCep}/json/`,
       );
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Não foi possível consultar o CEP.");
+      }
+
+      const data = (await response.json()) as ViaCepResponse;
 
       if (data.erro) {
-        alert("CEP não encontrado.");
+        await Swal.fire({
+          icon: "error",
+          title: "CEP não encontrado",
+          text: "Verifique o CEP informado e tente novamente.",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#172554",
+        });
+
         return;
       }
 
       setValue("logradouro", data.logradouro ?? "", {
         shouldValidate: true,
+        shouldDirty: true,
       });
 
       setValue("bairro", data.bairro ?? "", {
         shouldValidate: true,
+        shouldDirty: true,
       });
 
       setValue("cidade", data.localidade ?? "", {
         shouldValidate: true,
+        shouldDirty: true,
       });
 
       setValue("estado", data.uf ?? "", {
         shouldValidate: true,
+        shouldDirty: true,
       });
 
       setFocus("numero");
     } catch {
-      alert("Erro ao buscar o CEP. Tente novamente.");
+      await Swal.fire({
+        icon: "error",
+        title: "Erro ao consultar CEP",
+        text: "Não foi possível buscar o endereço. Tente novamente.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#172554",
+      });
     }
   };
 
-  const sleep = (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
-
   const onSubmit = async (data: OccurrenceFormData) => {
-    await sleep(3000);
+    try {
+      const response = await fetch("/api/backend/solicitacoes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          titulo: data.title.trim(),
+          descricao: data.description.trim(),
+          urgencia: data.urgency,
+          subservicoId,
+          endereco: {
+            logradouro: data.logradouro.trim(),
+            numero: data.numero.trim(),
+            complemento: null,
+            bairro: data.bairro.trim(),
+            cidade: data.cidade.trim(),
+            estado: data.estado.trim().toUpperCase(),
+            cep: cleanCep(data.cep),
+            latitude: null,
+            longitude: null,
+          },
+        }),
+      });
 
-    const occurrence = {
-      id: crypto.randomUUID(),
-      titulo: data.title,
-      descricao: data.description,
-      endereco: {
-        cep: data.cep,
-        logradouro: data.logradouro,
-        numero: data.numero,
-        bairro: data.bairro,
-        cidade: data.cidade,
-        estado: data.estado,
-      },
-      dataOcorrencia: data.date,
-      urgencia: data.urgency,
-      imagem: data.image?.[0]?.name ?? null,
-      status: "Criada",
-      criadoEm: new Date().toISOString(),
-    };
+      const responseBody = await response.json().catch(() => null);
 
-    console.log("Solicitação criada:", occurrence);
+      if (response.status === 401 || response.status === 403) {
+        router.replace("/");
+        router.refresh();
+        return;
+      }
 
-    await Swal.fire({
-      icon: "success",
-      title: "Solicitação criada com sucesso!",
-      text: "Sua ocorrência foi registrada e será analisada pela equipe responsável.",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#172554",
-    });
+      if (!response.ok) {
+        throw new Error(
+          responseBody?.detail ||
+            responseBody?.message ||
+            "Não foi possível registrar a solicitação.",
+        );
+      }
 
-    reset();
-    router.push("/servicos");
+      const createdRequest = responseBody as CreatedRequestResponse;
+
+      if (!createdRequest || typeof createdRequest.id !== "number") {
+        throw new Error(
+          "A solicitação foi enviada, mas o servidor não retornou seu identificador.",
+        );
+      }
+
+      let attachmentError: string | null = null;
+      const selectedImage = data.image?.[0];
+
+      if (selectedImage) {
+        const formData = new FormData();
+
+        formData.append("arquivo", selectedImage);
+
+        const attachmentResponse = await fetch(
+          `/api/backend/solicitacoes/${createdRequest.id}/anexos`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        if (
+          attachmentResponse.status === 401 ||
+          attachmentResponse.status === 403
+        ) {
+          router.replace("/");
+          router.refresh();
+          return;
+        }
+
+        if (!attachmentResponse.ok) {
+          const attachmentBody = await attachmentResponse
+            .json()
+            .catch(() => null);
+
+          attachmentError =
+            attachmentBody?.detail ||
+            attachmentBody?.message ||
+            "Não foi possível enviar a imagem.";
+        }
+      }
+
+      if (attachmentError) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Solicitação criada",
+          text:
+            "A solicitação foi registrada, mas ocorreu um erro " +
+            `no envio da imagem: ${attachmentError}`,
+          confirmButtonText: "Ver solicitações",
+          confirmButtonColor: "#172554",
+        });
+      } else {
+        await Swal.fire({
+          icon: "success",
+          title: "Solicitação criada com sucesso!",
+          text: "Sua ocorrência foi registrada e será analisada.",
+          confirmButtonText: "Ver solicitações",
+          confirmButtonColor: "#172554",
+        });
+      }
+
+      reset();
+
+      router.push("/servicos/minhas-solicitacoes");
+      router.refresh();
+    } catch (error) {
+      await Swal.fire({
+        icon: "error",
+        title: "Erro ao registrar solicitação",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Não foi possível registrar a solicitação.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#172554",
+      });
+    }
   };
 
   const labelClass =
     "mb-1 block text-sm font-medium text-blue-950 lg:text-[17px]";
 
   const inputClass =
-    "h-10 w-full rounded-md border border-zinc-400 bg-white px-3 text-sm outline-none placeholder:italic placeholder:text-zinc-400 focus:border-blue-800 lg:h-[29px] lg:rounded-lg";
+    "h-10 w-full border-zinc-400 bg-white text-sm " +
+    "placeholder:italic placeholder:text-zinc-400 " +
+    "focus-visible:border-blue-800 focus-visible:ring-blue-800/20 " +
+    "lg:h-9 lg:rounded-lg";
 
   const errorClass = "mt-1 text-xs text-red-600";
 
@@ -159,41 +294,48 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="
-      mt-4 flex flex-col gap-3
-      lg:mx-auto lg:mt-10 lg:grid lg:w-[80%] lg:max-w-275
-      lg:grid-cols-2 lg:gap-x-3 lg:gap-y-3
-    "
+        mt-4 flex flex-col gap-3
+        lg:mx-auto lg:mt-10 lg:grid lg:w-[80%] lg:max-w-275
+        lg:grid-cols-2 lg:gap-x-3 lg:gap-y-3
+      "
     >
       {/* Título */}
       <div>
-        <label className={labelClass}>Título</label>
+        <Label htmlFor="title" className={labelClass}>
+          Título
+        </Label>
 
-        <input
+        <Input
+          id="title"
           type="text"
           placeholder="Relate a ocorrência"
           className={inputClass}
+          aria-invalid={!!errors.title}
           {...register("title")}
         />
 
         {errors.title && <p className={errorClass}>{errors.title.message}</p>}
       </div>
 
-      {/* Localização / CEP */}
+      {/* CEP */}
       <div>
-        <label className={labelClass}>
+        <Label htmlFor="cep" className={labelClass}>
           <span className="lg:hidden">CEP</span>
           <span className="hidden lg:inline">Localização</span>
-        </label>
+        </Label>
 
-        <input
+        <Input
+          id="cep"
           type="text"
+          inputMode="numeric"
           placeholder="Digite endereço ou CEP"
           maxLength={9}
           className={inputClass}
+          aria-invalid={!!errors.cep}
           {...cepRegister}
           onChange={(event) => {
             cepRegister.onChange(event);
-            handleCepChange(event);
+            void handleCepChange(event);
           }}
         />
 
@@ -202,17 +344,20 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
 
       {/* Descrição */}
       <div className="lg:col-span-2">
-        <label className={labelClass}>Descrição da Ocorrência</label>
+        <Label htmlFor="description" className={labelClass}>
+          Descrição da Ocorrência
+        </Label>
 
-        <textarea
+        <Textarea
+          id="description"
           placeholder="Descreva aqui o problema"
           className="
-          min-h-20 w-full resize-none rounded-md border border-zinc-400
-          bg-white px-3 py-2 text-sm outline-none
-          placeholder:italic placeholder:text-zinc-400
-          focus:border-blue-800
-          lg:min-h-33.5 lg:rounded-lg
-        "
+            min-h-20 resize-none border-zinc-400 bg-white text-sm
+            placeholder:italic placeholder:text-zinc-400
+            focus-visible:border-blue-800 focus-visible:ring-blue-800/20
+            lg:min-h-32 lg:rounded-lg
+          "
+          aria-invalid={!!errors.description}
           {...register("description")}
         />
 
@@ -223,12 +368,16 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
 
       {/* Logradouro */}
       <div className="lg:col-span-2">
-        <label className={labelClass}>Logradouro</label>
+        <Label htmlFor="logradouro" className={labelClass}>
+          Logradouro
+        </Label>
 
-        <input
+        <Input
+          id="logradouro"
           type="text"
           placeholder="Rua, avenida, travessa..."
           className={inputClass}
+          aria-invalid={!!errors.logradouro}
           {...register("logradouro")}
         />
 
@@ -239,12 +388,16 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
 
       {/* Número */}
       <div>
-        <label className={labelClass}>Número</label>
+        <Label htmlFor="numero" className={labelClass}>
+          Número
+        </Label>
 
-        <input
+        <Input
+          id="numero"
           type="text"
           placeholder="Digite o número"
           className={inputClass}
+          aria-invalid={!!errors.numero}
           {...register("numero")}
         />
 
@@ -253,12 +406,16 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
 
       {/* Bairro */}
       <div>
-        <label className={labelClass}>Bairro</label>
+        <Label htmlFor="bairro" className={labelClass}>
+          Bairro
+        </Label>
 
-        <input
+        <Input
+          id="bairro"
           type="text"
           placeholder="Bairro"
           className={inputClass}
+          aria-invalid={!!errors.bairro}
           {...register("bairro")}
         />
 
@@ -267,12 +424,16 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
 
       {/* Cidade */}
       <div>
-        <label className={labelClass}>Cidade</label>
+        <Label htmlFor="cidade" className={labelClass}>
+          Cidade
+        </Label>
 
-        <input
+        <Input
+          id="cidade"
           type="text"
           placeholder="Cidade"
           className={inputClass}
+          aria-invalid={!!errors.cidade}
           {...register("cidade")}
         />
 
@@ -281,13 +442,17 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
 
       {/* Estado */}
       <div>
-        <label className={labelClass}>Estado</label>
+        <Label htmlFor="estado" className={labelClass}>
+          Estado
+        </Label>
 
-        <input
+        <Input
+          id="estado"
           type="text"
           placeholder="UF"
           maxLength={2}
           className={`${inputClass} uppercase`}
+          aria-invalid={!!errors.estado}
           {...register("estado")}
           onChange={(event) => {
             setValue("estado", event.target.value.toUpperCase(), {
@@ -300,65 +465,74 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
         {errors.estado && <p className={errorClass}>{errors.estado.message}</p>}
       </div>
 
-      {/* Data */}
-      <div>
-        <label className={labelClass}>Data da Ocorrência</label>
-
-        <input type="date" className={inputClass} {...register("date")} />
-
-        {errors.date && <p className={errorClass}>{errors.date.message}</p>}
-      </div>
-
       {/* Imagem */}
       <div>
-        <label className={labelClass}>Imagem</label>
+        <Label className={labelClass}>Imagem</Label>
 
-        <label
+        <Label
+          htmlFor="image"
           className="
-          flex h-24 w-full cursor-pointer flex-col items-center
-          justify-center rounded-md border border-zinc-400 bg-zinc-100
-          text-zinc-500
-          lg:h-7.5 lg:flex-row lg:justify-between lg:rounded-lg
-          lg:bg-white lg:px-3
-        "
+            flex h-24 w-full cursor-pointer flex-col items-center
+            justify-center rounded-md border border-zinc-400 bg-zinc-100
+            text-zinc-500 transition-colors hover:bg-zinc-200
+            lg:h-9 lg:flex-row lg:justify-between lg:rounded-lg
+            lg:bg-white lg:px-3 lg:hover:bg-zinc-50
+          "
         >
           <ImageIcon className="h-6 w-6 lg:hidden" />
 
-          <span className="mt-1 text-sm lg:hidden">Anexar Imagem</span>
+          <span className="mt-1 text-sm lg:hidden">Anexar imagem</span>
 
           <span className="hidden text-sm italic text-zinc-400 lg:inline">
             Escolher arquivo
           </span>
 
           <Paperclip className="hidden h-4 w-4 text-blue-600 lg:block" />
+        </Label>
 
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            {...register("image")}
-          />
-        </label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          {...register("image")}
+        />
+
+        {errors.image && (
+          <p className={errorClass}>{errors.image.message as string}</p>
+        )}
       </div>
 
       {/* Urgência */}
       <div>
-        <label className={labelClass}>Grau de Urgência</label>
+        <Label htmlFor="urgency" className={labelClass}>
+          Grau de Urgência
+        </Label>
 
-        <select
-          defaultValue=""
-          className={`${inputClass} text-zinc-500`}
-          {...register("urgency")}
-        >
-          <option value="" disabled>
-            Selecione o grau de urgência
-          </option>
+        <Controller
+          name="urgency"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger
+                id="urgency"
+                ref={field.ref}
+                onBlur={field.onBlur}
+                className={inputClass}
+                aria-invalid={!!errors.urgency}
+              >
+                <SelectValue placeholder="Selecione o grau de urgência" />
+              </SelectTrigger>
 
-          <option value="baixo">Baixo</option>
-          <option value="medio">Médio</option>
-          <option value="alto">Alto</option>
-          <option value="critico">Crítico</option>
-        </select>
+              <SelectContent>
+                <SelectItem value="BAIXA">Baixo</SelectItem>
+                <SelectItem value="MEDIA">Médio</SelectItem>
+                <SelectItem value="ALTA">Alto</SelectItem>
+                <SelectItem value="CRITICA">Crítico</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
 
         {errors.urgency && (
           <p className={errorClass}>{errors.urgency.message}</p>
@@ -368,9 +542,9 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
       {/* Observação */}
       <p
         className="
-        mt-20 text-xs leading-relaxed text-blue-500
-        lg:mt-0 lg:px-3 lg:text-[13px] lg:leading-5
-      "
+          mt-20 text-xs leading-relaxed text-blue-500
+          lg:mt-0 lg:px-3 lg:text-[13px] lg:leading-5
+        "
       >
         A urgência ajuda a equipe a priorizar a análise, mas o prazo de
         atendimento pode variar conforme avaliação técnica.
@@ -379,44 +553,43 @@ const OccurrenceForm = ({ backHref }: OccurrenceFormProps) => {
       {/* Navegação */}
       <div
         className="
-        mt-4 flex items-center justify-between
-        lg:col-span-2 lg:mt-3
-      "
+          mt-4 flex items-center justify-between
+          lg:col-span-2 lg:mt-3
+        "
       >
         <Link
           href={backHref}
           className="
-          flex items-center gap-2 text-sm text-blue-950
-          lg:text-base lg:font-semibold lg:text-blue-600
-        "
+            flex items-center gap-2 text-sm text-blue-950
+            lg:text-base lg:font-semibold lg:text-blue-600
+          "
         >
           <ArrowLeft className="h-4 w-4" />
           Voltar
         </Link>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
           className="
-          flex items-center gap-2 rounded-md bg-blue-950 px-5 py-3
-          text-sm font-medium text-white
-          disabled:cursor-not-allowed disabled:opacity-70
-          lg:rounded-lg lg:px-5 lg:text-base
-        "
+            flex items-center gap-2 bg-blue-950 px-5 py-3
+            text-sm font-medium text-white hover:bg-blue-900
+            lg:text-base
+          "
         >
           {isSubmitting && (
             <span
               className="
-              h-4 w-4 animate-spin rounded-full border-2
-              border-white border-t-transparent
-            "
+                h-4 w-4 animate-spin rounded-full border-2
+                border-white border-t-transparent
+              "
             />
           )}
 
           {isSubmitting ? "Registrando..." : "Continuar"}
 
           {!isSubmitting && <ArrowRight className="h-4 w-4" />}
-        </button>
+        </Button>
       </div>
     </form>
   );

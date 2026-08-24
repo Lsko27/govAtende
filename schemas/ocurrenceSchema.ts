@@ -100,7 +100,7 @@ export const occurrenceSchema: yup.ObjectSchema<OccurrenceFormData> =
       .string()
       .required("Selecione o grau de urgência.")
       .oneOf(
-        ["baixo", "medio", "alto", "critico"],
+        ["BAIXA", "MEDIA", "ALTA", "CRITICA"],
         "Selecione um grau de urgência válido.",
       ),
 
