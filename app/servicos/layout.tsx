@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import Navbar from "@/components/navbar";
+
 const COOKIE_NAME = "govatende_session";
 
 type ServicosLayoutProps = {
@@ -42,5 +44,10 @@ export default async function ServicosLayout({
     throw new Error("Não foi possível validar a sessão.");
   }
 
-  return children;
+  return (
+    <>
+      <Navbar authenticated />
+      {children}
+    </>
+  );
 }

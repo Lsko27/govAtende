@@ -390,7 +390,7 @@ const CadastroPage = () => {
               <p className="mt-6 text-center text-sm text-gray-600">
                 Já possui uma conta?{" "}
                 <Link
-                  href="/"
+                  href="/login"
                   className="font-semibold text-blue-800 hover:underline"
                 >
                   Entrar

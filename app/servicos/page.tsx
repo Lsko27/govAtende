@@ -1,5 +1,4 @@
 import LevelProgress from "@/components/level-progress";
-import Navbar from "@/components/navbar";
 import SearchInput from "@/components/search-input";
 import ServiceCard from "@/components/service-card";
 import { services } from "@/data/services";
@@ -7,7 +6,6 @@ import { services } from "@/data/services";
 const ServiceHomePage = () => {
   return (
     <>
-      <Navbar />
       <LevelProgress />
 
       <div className="mx-5 mt-5">

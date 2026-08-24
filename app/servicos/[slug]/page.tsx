@@ -1,5 +1,4 @@
 import LevelProgress from "@/components/level-progress";
-import Navbar from "@/components/navbar";
 import SearchInput from "@/components/search-input";
 import SubServiceCard from "@/components/sub-service-card";
 import { services } from "@/data/services";
@@ -24,7 +23,6 @@ const ServicePage = async ({ params }: PageProps) => {
 
   return (
     <>
-      <Navbar />
       <LevelProgress />
 
       <main className="min-h-screen bg-zinc-100 px-5 pt-5">

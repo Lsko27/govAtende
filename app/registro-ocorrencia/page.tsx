@@ -24,7 +24,7 @@ const RegisterOccurrencePage = async ({
 
   return (
     <>
-      <Navbar />
+      <Navbar authenticated />
       <LevelProgress />
 
       <main className="min-h-screen bg-zinc-100 px-4 pt-4 pb-6">
