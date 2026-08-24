@@ -279,10 +279,7 @@ const NotificationsDropdown = () => {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        className="w-[360px] overflow-hidden p-0"
-      >
+      <DropdownMenuContent align="end" className="w-90 overflow-hidden p-0">
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div>
             <h2 className="font-semibold text-blue-950">Notificações</h2>
@@ -315,7 +312,7 @@ const NotificationsDropdown = () => {
           )}
         </div>
 
-        <div className="max-h-[420px] overflow-y-auto">
+        <div className="max-h-105 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-zinc-500">
               <LoaderCircle className="h-4 w-4 animate-spin" />

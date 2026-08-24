@@ -8,7 +8,13 @@ import Swal from "sweetalert2";
 
 import NotificationsDropdown from "@/components/notification-dropdown";
 
-import { ClipboardList, LogOut, User } from "lucide-react";
+import {
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+  User,
+  Settings,
+} from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -21,20 +27,56 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+type NavbarVariant = "cidadao" | "servidor";
+
 type NavbarProps = {
   authenticated?: boolean;
+  variant?: NavbarVariant;
   requestsHref?: string;
+  userName?: string;
+  userRole?: string;
 };
+
+const navigationConfig = {
+  cidadao: {
+    homeHref: "/servicos",
+    loginHref: "/",
+    logoutEndpoint: "/api/auth/logout",
+    settingsHref: "/configuracoes",
+  },
+
+  servidor: {
+    homeHref: "/servidor/painel",
+    loginHref: "/servidor",
+    logoutEndpoint: "/api/auth/servidor/logout",
+    settingsHref: "/servidor/configuracoes",
+  },
+} satisfies Record<
+  NavbarVariant,
+  {
+    homeHref: string;
+    loginHref: string;
+    logoutEndpoint: string;
+    settingsHref?: string;
+  }
+>;
 
 const Navbar = ({
   authenticated = false,
+  variant = "cidadao",
   requestsHref = "/servicos/minhas-solicitacoes",
+  userName,
+  userRole,
 }: NavbarProps) => {
   const router = useRouter();
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const homeHref = authenticated ? "/servicos" : "/";
+  const isServer = variant === "servidor";
+
+  const currentNavigation = navigationConfig[variant];
+
+  const homeHref = authenticated ? currentNavigation.homeHref : "/";
 
   const handleLogout = async () => {
     if (isLoggingOut) {
@@ -44,7 +86,7 @@ const Navbar = ({
     setIsLoggingOut(true);
 
     try {
-      const response = await fetch("/api/auth/logout", {
+      const response = await fetch(currentNavigation.logoutEndpoint, {
         method: "POST",
       });
 
@@ -52,7 +94,7 @@ const Navbar = ({
         throw new Error("Não foi possível encerrar a sessão.");
       }
 
-      router.replace("/");
+      router.replace(currentNavigation.loginHref);
       router.refresh();
     } catch (error) {
       await Swal.fire({
@@ -90,7 +132,7 @@ const Navbar = ({
 
           {authenticated && (
             <div className="flex items-center gap-4">
-              <NotificationsDropdown />
+              {!isServer && <NotificationsDropdown />}
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -98,9 +140,11 @@ const Navbar = ({
                     type="button"
                     aria-label="Abrir menu do usuário"
                     className="
-                      flex h-10 w-10 cursor-pointer items-center
-                      justify-center rounded-full bg-zinc-700
-                      outline-none transition hover:bg-zinc-800
+                      flex h-10 w-10 cursor-pointer
+                      items-center justify-center
+                      rounded-full bg-zinc-700
+                      outline-none transition
+                      hover:bg-zinc-800
                       focus-visible:ring-2
                       focus-visible:ring-blue-700
                     "
@@ -109,15 +153,44 @@ const Navbar = ({
                   </button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel className="font-normal">
+                    <p className="truncate text-sm font-semibold text-blue-950">
+                      {userName ?? (isServer ? "Servidor" : "Minha conta")}
+                    </p>
+
+                    {userRole && (
+                      <p className="mt-0.5 truncate text-xs text-zinc-500">
+                        {userRole}
+                      </p>
+                    )}
+                  </DropdownMenuLabel>
 
                   <DropdownMenuSeparator />
 
+                  {isServer ? (
+                    <DropdownMenuItem asChild>
+                      <Link href="/servidor/painel" className="cursor-pointer">
+                        <LayoutDashboard className="h-4 w-4" />
+                        Painel administrativo
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem asChild>
+                      <Link href={requestsHref} className="cursor-pointer">
+                        <ClipboardList className="h-4 w-4" />
+                        Minhas solicitações
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
                   <DropdownMenuItem asChild>
-                    <Link href={requestsHref} className="cursor-pointer">
-                      <ClipboardList className="h-4 w-4" />
-                      Minhas solicitações
+                    <Link
+                      href={currentNavigation.settingsHref}
+                      className="cursor-pointer"
+                    >
+                      <Settings className="h-4 w-4" />
+                      Configurações
                     </Link>
                   </DropdownMenuItem>
 
@@ -127,9 +200,9 @@ const Navbar = ({
                     disabled={isLoggingOut}
                     onClick={() => void handleLogout()}
                     className="
-                      cursor-pointer text-red-600
-                      focus:bg-red-50 focus:text-red-700
-                    "
+    cursor-pointer text-red-600
+    focus:bg-red-50 focus:text-red-700
+  "
                   >
                     <LogOut className="h-4 w-4 text-red-600" />
 

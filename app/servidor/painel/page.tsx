@@ -2,17 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Swal from "sweetalert2";
+import Navbar from "@/components/navbar";
 
 import {
   CheckCircle2,
   CircleAlert,
   ClipboardList,
   Clock3,
-  LogOut,
   Search,
-  UserRound,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -208,7 +206,6 @@ const ServerDashboardPage = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState("");
 
   const loadPanel = useCallback(async () => {
@@ -443,21 +440,6 @@ const ServerDashboardPage = () => {
     }
   };
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-
-    try {
-      await fetch("/api/auth/servidor/logout", {
-        method: "POST",
-      });
-
-      router.replace("/servidor");
-      router.refresh();
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-zinc-100">
@@ -494,45 +476,12 @@ const ServerDashboardPage = () => {
 
   return (
     <>
-      <header className="border-b bg-white px-4 py-3 shadow-sm md:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Image
-            src="/GovAtende.png"
-            width={130}
-            height={50}
-            alt="GovAtende"
-            priority
-          />
-
-          <div className="flex items-center gap-4">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-blue-950">
-                {profile.nome}
-              </p>
-
-              <p className="text-xs text-zinc-500">{profile.cargo}</p>
-            </div>
-
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-950">
-              <UserRound className="h-5 w-5 text-white" />
-            </div>
-
-            <Button
-              type="button"
-              variant="ghost"
-              disabled={isLoggingOut}
-              onClick={() => void handleLogout()}
-              className="text-red-600 hover:bg-red-50 hover:text-red-700"
-            >
-              <LogOut className="h-4 w-4 text-red-600" />
-
-              <span className="hidden sm:inline">
-                {isLoggingOut ? "Saindo..." : "Sair"}
-              </span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar
+        authenticated
+        variant="servidor"
+        userName={profile.nome}
+        userRole={profile.cargo}
+      />
 
       <main className="min-h-screen bg-zinc-100 px-4 py-8 md:px-8">
         <div className="mx-auto max-w-7xl">
@@ -671,9 +620,7 @@ const ServerDashboardPage = () => {
                 <Table className="min-w-290 table-fixed">
                   <TableHeader>
                     <TableRow className="bg-blue-950 hover:bg-blue-950">
-                      <TableHead className="w-15 px-4 text-white">
-                        ID
-                      </TableHead>
+                      <TableHead className="w-15 px-4 text-white">ID</TableHead>
 
                       <TableHead className="w-55 px-4 text-white">
                         Solicitação
