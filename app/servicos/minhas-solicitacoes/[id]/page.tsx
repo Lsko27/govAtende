@@ -649,7 +649,7 @@ const RequestDetailsPage = () => {
                           className="relative flex gap-4 pb-7 last:pb-0"
                         >
                           {!isLast && (
-                            <span className="absolute left-[7px] top-4 h-full w-px bg-zinc-200" />
+                            <span className="absolute left-1.75 top-4 h-full w-px bg-zinc-200" />
                           )}
 
                           <span

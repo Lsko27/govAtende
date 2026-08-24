@@ -15,7 +15,6 @@ import {
   X,
 } from "lucide-react";
 import Swal from "sweetalert2";
-import Navbar from "@/components/navbar";
 
 type StatusSolicitacao =
   | "REGISTRADA"
