@@ -17,7 +17,6 @@ import {
 import { formatCpf, maskCpf } from "@/utils/formatters";
 import { isValidCpf } from "@/utils/validateCpf";
 import { useRouter } from "next/navigation";
-import { validatePassword } from "@/utils/validatePassword";
 import Link from "next/link";
 
 const LoginPage = () => {
@@ -45,25 +44,9 @@ const LoginPage = () => {
     setStep("senha");
   };
 
-  async function fakeLogin() {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    return true;
-  }
-
   const handleLogin = async () => {
-    const passwordError = validatePassword(senha);
-
-    if (passwordError) {
-      setSenhaError(passwordError);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Senha inválida",
-        text: passwordError,
-        confirmButtonText: "OK",
-        confirmButtonColor: "#1e40af",
-      });
-
+    if (!senha.trim()) {
+      setSenhaError("A senha é obrigatória.");
       return;
     }
 
@@ -71,22 +54,48 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      await fakeLogin();
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          cpf: cpf.replace(/\D/g, ""),
+          senha,
+        }),
+      });
+
+      const responseBody = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          responseBody?.detail ||
+            responseBody?.message ||
+            "CPF ou senha inválidos.",
+        );
+      }
 
       await Swal.fire({
         icon: "success",
         title: "Login realizado com sucesso!",
-        text: "Você será redirecionado para a área de serviços.",
+        text: `Bem-vindo, ${responseBody.nome}.`,
         confirmButtonText: "Continuar",
         confirmButtonColor: "#1e40af",
       });
 
       router.push("/servicos");
-    } catch {
+      router.refresh();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Não foi possível concluir o login.";
+
       await Swal.fire({
         icon: "error",
         title: "Erro ao realizar login",
-        text: "Não foi possível concluir o login. Tente novamente.",
+        text: message,
         confirmButtonText: "OK",
         confirmButtonColor: "#1e40af",
       });
