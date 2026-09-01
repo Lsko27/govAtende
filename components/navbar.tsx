@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import NotificationsDropdown from "@/components/notification-dropdown";
 
 import {
+  ChartColumn,
   ClipboardList,
   LayoutDashboard,
   LogOut,
@@ -172,12 +173,27 @@ const Navbar = ({
                   <DropdownMenuSeparator />
 
                   {isServer ? (
-                    <DropdownMenuItem asChild>
-                      <Link href="/servidor/painel" className="cursor-pointer">
-                        <LayoutDashboard className="h-4 w-4" />
-                        Painel administrativo
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/servidor/painel"
+                          className="cursor-pointer"
+                        >
+                          <LayoutDashboard className="h-4 w-4" />
+                          Painel administrativo
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/servidor/relatorios"
+                          className="cursor-pointer"
+                        >
+                          <ChartColumn className="h-4 w-4" />
+                          Relatórios estatísticos
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   ) : (
                     <DropdownMenuItem asChild>
                       <Link href={requestsHref} className="cursor-pointer">
