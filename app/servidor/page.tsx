@@ -14,10 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+type ServerProfile = "SERVIDOR" | "AUDITOR";
+
 type ServerLoginResponse = {
   servidorId: number;
   nome: string;
   cargo: string;
+  perfil: ServerProfile;
   mensagem: string;
 };
 
@@ -66,15 +69,23 @@ const ServerLoginPage = () => {
 
       const server = responseBody as ServerLoginResponse;
 
+      const destinationHref =
+        server.perfil === "AUDITOR"
+          ? "/servidor/auditoria"
+          : "/servidor/painel";
+
+      const destinationLabel =
+        server.perfil === "AUDITOR" ? "Acessar governança" : "Acessar painel";
+
       await Swal.fire({
         icon: "success",
         title: "Login realizado",
         text: `Bem-vindo, ${server.nome}.`,
-        confirmButtonText: "Acessar painel",
+        confirmButtonText: destinationLabel,
         confirmButtonColor: "#172554",
       });
 
-      router.replace("/servidor/painel");
+      router.replace(destinationHref);
       router.refresh();
     } catch (error) {
       const message =

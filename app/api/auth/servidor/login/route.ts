@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+type ServerProfile = "SERVIDOR" | "AUDITOR";
+
 type ServerLoginResponse = {
   token: string;
   tipo: string;
@@ -7,6 +9,7 @@ type ServerLoginResponse = {
   servidorId: number;
   nome: string;
   cargo: string;
+  perfil: ServerProfile;
   mensagem: string;
 };
 
@@ -69,10 +72,25 @@ export async function POST(request: Request) {
 
     const loginResponse = responseBody as ServerLoginResponse;
 
+    if (
+      loginResponse.perfil !== "SERVIDOR" &&
+      loginResponse.perfil !== "AUDITOR"
+    ) {
+      return NextResponse.json(
+        {
+          message: "O perfil retornado pelo servidor é inválido.",
+        },
+        {
+          status: 502,
+        },
+      );
+    }
+
     const response = NextResponse.json({
       servidorId: loginResponse.servidorId,
       nome: loginResponse.nome,
       cargo: loginResponse.cargo,
+      perfil: loginResponse.perfil,
       mensagem: loginResponse.mensagem,
     });
 

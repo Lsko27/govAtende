@@ -671,7 +671,12 @@ const ServerDashboardPage = () => {
                         return (
                           <TableRow
                             key={request.id}
-                            className="hover:bg-zinc-50"
+                            onClick={() =>
+                              router.push(
+                                `/servidor/solicitacoes/${request.id}`,
+                              )
+                            }
+                            className="cursor-pointer hover:bg-zinc-50"
                           >
                             <TableCell className="px-4 font-semibold text-blue-950">
                               #{request.id}
