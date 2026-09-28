@@ -15,6 +15,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import ForecastChart from "@/components/forecast-chart";
+import ForecastHistory from "@/components/forecast-history";
+
 import Navbar from "@/components/navbar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -29,12 +32,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   PARAMETROS_PADRAO_PREVISAO,
   PrevisaoDemandaApiError,
+  consultarHistoricoPrevisoes,
   consultarResumoPrevisao,
   consultarUltimasPrevisoes,
   gerarPrevisaoDemanda,
+  type HistoricoPrevisaoDemanda,
   type NivelDemanda,
   type PrevisaoDemanda,
   type ResumoPrevisaoDemanda,
@@ -143,14 +149,18 @@ const DemandForecastPage = () => {
     router.refresh();
   }, [router]);
 
+  const [history, setHistory] = useState<HistoricoPrevisaoDemanda[]>([]);
+
   const loadForecasts = useCallback(async () => {
-    const [summaryBody, forecastsBody] = await Promise.all([
+    const [summaryBody, forecastsBody, historyBody] = await Promise.all([
       consultarResumoPrevisao(),
       consultarUltimasPrevisoes(),
+      consultarHistoricoPrevisoes(),
     ]);
 
     setSummary(summaryBody);
     setForecasts(forecastsBody);
+    setHistory(historyBody);
   }, []);
 
   const loadPage = useCallback(async () => {
@@ -474,6 +484,8 @@ const DemandForecastPage = () => {
                 </Card>
               </section>
 
+              <ForecastChart forecasts={forecasts} />
+
               <Card className="mt-6 overflow-hidden">
                 <CardContent className="p-0">
                   <Table>
@@ -559,6 +571,8 @@ const DemandForecastPage = () => {
                   </Table>
                 </CardContent>
               </Card>
+
+              <ForecastHistory history={history} />
             </>
           )}
 
