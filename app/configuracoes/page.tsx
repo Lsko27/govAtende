@@ -35,6 +35,7 @@ type AccountProfile = {
   cargo?: string | null;
   dataCadastro: string;
   ativo: boolean;
+  perfil: "SERVIDOR" | "AUDITOR";
 };
 
 type CitizenForm = {
@@ -432,6 +433,7 @@ const SettingsPage = ({ searchParams }: SettingsPageProps) => {
         variant={variant}
         userName={profile?.nome}
         userRole={isCitizen ? "Cidadão" : (profile?.cargo ?? "Servidor")}
+        userProfile={isCitizen ? undefined : profile?.perfil}
       />
 
       <main className="min-h-[calc(100vh-73px)] bg-zinc-100 px-4 py-8">

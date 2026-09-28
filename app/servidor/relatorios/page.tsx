@@ -71,6 +71,7 @@ type ServerProfile = {
   cargo: string;
   dataCadastro: string;
   ativo: boolean;
+  perfil: "SERVIDOR" | "AUDITOR";
 };
 
 type DistributionItem = {
@@ -608,6 +609,7 @@ const ServerReportsPage = () => {
         variant="servidor"
         userName={profile.nome}
         userRole={profile.cargo}
+        userProfile={profile.perfil}
       />
 
       <main className="min-h-screen bg-zinc-100 px-4 py-8 md:px-8">

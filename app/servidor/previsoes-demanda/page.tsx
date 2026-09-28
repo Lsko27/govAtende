@@ -258,6 +258,7 @@ const DemandForecastPage = () => {
           variant="servidor"
           userName={profile?.nome}
           userRole={profile?.cargo}
+          userProfile={profile?.perfil}
         />
 
         <main className="flex min-h-[calc(100vh-73px)] items-center justify-center bg-zinc-100 px-4">

@@ -9,10 +9,12 @@ import Swal from "sweetalert2";
 import NotificationsDropdown from "@/components/notification-dropdown";
 
 import {
+  BrainCircuit,
   ChartColumn,
   ClipboardList,
   LayoutDashboard,
   LogOut,
+  ScrollText,
   Settings,
   User,
 } from "lucide-react";
@@ -30,12 +32,15 @@ import {
 
 type NavbarVariant = "cidadao" | "servidor";
 
+type InternalProfile = "SERVIDOR" | "AUDITOR";
+
 type NavbarProps = {
   authenticated?: boolean;
   variant?: NavbarVariant;
   requestsHref?: string;
   userName?: string;
   userRole?: string;
+  userProfile?: InternalProfile;
 };
 
 type NavigationConfig = {
@@ -67,6 +72,7 @@ const Navbar = ({
   requestsHref = "/servicos/minhas-solicitacoes",
   userName,
   userRole,
+  userProfile,
 }: NavbarProps) => {
   const router = useRouter();
 
@@ -74,15 +80,25 @@ const Navbar = ({
 
   const isServer = variant === "servidor";
 
+  const isAuditor = isServer && userProfile === "AUDITOR";
+
   const currentNavigation = navigationConfig[variant];
 
-  const homeHref = authenticated
-    ? currentNavigation.homeHref
-    : currentNavigation.loginHref;
+  const homeHref = !authenticated
+    ? currentNavigation.loginHref
+    : isAuditor
+      ? "/servidor/auditoria"
+      : currentNavigation.homeHref;
 
   const displayedName = userName ?? (isServer ? "Servidor" : "Minha conta");
 
-  const displayedRole = userRole ?? (isServer ? "Servidor público" : "Cidadão");
+  const displayedRole =
+    userRole ??
+    (isAuditor
+      ? "Governança e auditoria"
+      : isServer
+        ? "Servidor público"
+        : "Cidadão");
 
   const handleLogout = async () => {
     if (isLoggingOut) {
@@ -101,6 +117,7 @@ const Navbar = ({
       }
 
       router.replace(currentNavigation.loginHref);
+
       router.refresh();
     } catch (error) {
       await Swal.fire({
@@ -174,15 +191,27 @@ const Navbar = ({
 
                   {isServer ? (
                     <>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href="/servidor/painel"
-                          className="cursor-pointer"
-                        >
-                          <LayoutDashboard className="h-4 w-4" />
-                          Painel administrativo
-                        </Link>
-                      </DropdownMenuItem>
+                      {isAuditor ? (
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/servidor/auditoria"
+                            className="cursor-pointer"
+                          >
+                            <ScrollText className="h-4 w-4" />
+                            Trilhas de auditoria
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/servidor/painel"
+                            className="cursor-pointer"
+                          >
+                            <LayoutDashboard className="h-4 w-4" />
+                            Painel administrativo
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
 
                       <DropdownMenuItem asChild>
                         <Link
@@ -193,6 +222,18 @@ const Navbar = ({
                           Relatórios estatísticos
                         </Link>
                       </DropdownMenuItem>
+
+                      {!isAuditor && (
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/servidor/previsoes-demanda"
+                            className="cursor-pointer"
+                          >
+                            <BrainCircuit className="h-4 w-4" />
+                            Previsão de demanda
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                     </>
                   ) : (
                     <DropdownMenuItem asChild>
@@ -220,7 +261,8 @@ const Navbar = ({
                     onSelect={() => void handleLogout()}
                     className="
                       cursor-pointer text-red-600
-                      focus:bg-red-50 focus:text-red-700
+                      focus:bg-red-50
+                      focus:text-red-700
                     "
                   >
                     <LogOut className="h-4 w-4 text-red-600" />
