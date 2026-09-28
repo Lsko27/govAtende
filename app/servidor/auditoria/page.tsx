@@ -472,6 +472,7 @@ const AuditPage = () => {
         variant="servidor"
         userName={profile?.nome}
         userRole={profile?.cargo ?? "Governança e auditoria"}
+        userProfile={profile?.perfil ?? "AUDITOR"}
       />
 
       <main className="min-h-[calc(100vh-73px)] bg-zinc-100 px-4 py-8">
