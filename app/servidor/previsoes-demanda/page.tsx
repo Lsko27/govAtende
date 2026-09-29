@@ -46,6 +46,7 @@ import {
   type ResumoPrevisaoDemanda,
   type TendenciaDemanda,
 } from "@/lib/previsao-demanda-api";
+import TriageQueue from "@/components/triage-queue";
 
 type ServerProfile = {
   id: number;
@@ -575,6 +576,8 @@ const DemandForecastPage = () => {
               <ForecastHistory history={history} />
             </>
           )}
+
+          {profile.perfil === "SERVIDOR" && <TriageQueue />}
 
           <div className="mt-6 flex justify-end">
             <Button variant="outline" onClick={() => void loadPage()}>
