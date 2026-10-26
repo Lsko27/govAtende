@@ -46,6 +46,7 @@ import {
   type ResumoPrevisaoDemanda,
   type TendenciaDemanda,
 } from "@/lib/previsao-demanda-api";
+import ForecastStatisticalAnalysis from "@/components/forecast-statistical-analysis";
 import TriageQueue from "@/components/triage-queue";
 
 type ServerProfile = {
@@ -486,6 +487,8 @@ const DemandForecastPage = () => {
               </section>
 
               <ForecastChart forecasts={forecasts} />
+
+              <ForecastStatisticalAnalysis forecasts={forecasts} />
 
               <Card className="mt-6 overflow-hidden">
                 <CardContent className="p-0">

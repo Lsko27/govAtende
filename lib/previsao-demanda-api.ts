@@ -2,6 +2,13 @@ export type NivelDemanda = "BAIXA" | "MEDIA" | "ALTA" | "CRITICA";
 
 export type TendenciaDemanda = "CRESCENTE" | "ESTAVEL" | "DECRESCENTE";
 
+export type ForcaCorrelacao =
+  | "MUITO_FRACA"
+  | "FRACA"
+  | "MODERADA"
+  | "FORTE"
+  | "MUITO_FORTE";
+
 export type PrevisaoDemanda = {
   idPrevisao: number;
   bairro: string;
@@ -25,7 +32,20 @@ export type PrevisaoDemanda = {
   nivelDemanda: NivelDemanda;
 
   confianca: number;
-  justificativa: string;
+  justificativa: string | null;
+
+  coeficienteCorrelacao: number | null;
+  coeficienteDeterminacao: number | null;
+  coeficienteAngular: number | null;
+  intercepto: number | null;
+
+  equacao: string | null;
+  forcaCorrelacao: ForcaCorrelacao | null;
+  tendenciaRegressao: TendenciaDemanda | null;
+
+  quantidadeDiasRegressao: number | null;
+  variacaoEstimadaPercentual: number | null;
+  interpretacaoRegressao: string | null;
 
   nomeModelo: string;
   versaoModelo: string;
@@ -100,6 +120,7 @@ export type ResultadoGeracaoPrevisao = {
 type ApiErrorBody = {
   detail?: string;
   message?: string;
+  error?: string;
 };
 
 const BASE_ENDPOINT = "/api/backend/servidor/previsoes-demanda";
@@ -125,7 +146,7 @@ export class PrevisaoDemandaApiError extends Error {
 const lerCorpoErro = async (response: Response, fallback: string) => {
   const body = (await response.json().catch(() => null)) as ApiErrorBody | null;
 
-  return body?.detail || body?.message || fallback;
+  return body?.detail || body?.message || body?.error || fallback;
 };
 
 const requisitarJson = async <T>(
@@ -140,6 +161,7 @@ const requisitarJson = async <T>(
     ...init,
     headers,
     cache: "no-store",
+    credentials: "same-origin",
   });
 
   if (!response.ok) {
@@ -158,7 +180,7 @@ const requisitarJson = async <T>(
 const retornarVazioQuandoNaoEncontrado = async <T>(
   request: Promise<T>,
   emptyValue: T,
-) => {
+): Promise<T> => {
   try {
     return await request;
   } catch (error) {
