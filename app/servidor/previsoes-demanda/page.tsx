@@ -48,6 +48,7 @@ import {
 } from "@/lib/previsao-demanda-api";
 import ForecastStatisticalAnalysis from "@/components/forecast-statistical-analysis";
 import TriageQueue from "@/components/triage-queue";
+import ForecastStatisticalAnalysis from "@/components/forecast-statistical-analysis";
 
 type ServerProfile = {
   id: number;
